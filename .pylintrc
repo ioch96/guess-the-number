@@ -1,4 +1,0 @@
-[BASIC]
-
-# List of allowed names which don't trigger the invalid-name checker.
-good-names=attempts

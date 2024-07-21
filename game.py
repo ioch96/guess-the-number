@@ -1,59 +1,127 @@
 """
-Number Guessing Game
-
-This module allows the user to guess a randomly generated number between 0 and 100.
-The user receives feedback on whether their guess is too low or too high, and the
-number of attempts taken to guess the correct number is tracked and displayed.
+This module contains the implementation of a simple Tic-Tac-Toe game.
 """
 
-import random
+class TicTacToe:
+    """Represents a Tic-Tac-Toe game.
 
-def main():
+    Manages the game board, player turns, and checks for game outcomes such as wins and draws.
     """
-    Main function to run the number guessing game.
+    def __init__(self):
+        self.game_active = True
+        self.current_player = "X"
+        self.game_board = [" ",
+                           "1", "2", "3",
+                           "4", "5", "6",
+                           "7", "8", "9"
+                          ]
 
-    This function generates a random number between 0 and 100 and prompts the user to
-    guess the number. It provides feedback on whether the guess is too low or too high
-    and keeps track of the number of attempts the user takes to guess the correct number.
-    """
-    # Generate a random integer between 0 and 100 (both included)
-    random_number = random.randint(0, 100)
+    def print_board(self):
+        """Prints the current state of the game board."""
+        print(self.game_board[1] + "|" + self.game_board[2] + "|" + self.game_board[3])
+        print(self.game_board[4] + "|" + self.game_board[5] + "|" + self.game_board[6])
+        print(self.game_board[7] + "|" + self.game_board[8] + "|" + self.game_board[9])
 
-    # Initialize a counter to keep track of the number of attempts
-    attempts = 0
+    def player_input(self):
+        """Handles player input for making a move.
 
-    # Start an infinite loop to allow continuous guessing until the correct number is guessed
-    while True:
-        try:
-            # Prompt the user to enter a guess and convert the input to an integer
-            guess = int(input("Enter your guess (0-100): "))
+        Prompts the user to enter a position on the game board. 
+        Validates the input to ensure it is a number between 1 and 9, and 
+        checks that the position is not already taken. Allows the user to quit
+        the game by entering 'q'.
+        
+        Returns:
+            int or None: The position chosen by the player, or None if the player quits.
+        """
+        while True:
+            move = input("Please enter a position: ")
 
-            # Check if the guess is within the valid range
-            if guess < 0 or guess > 100:
-                print("Please enter a number between 0 and 100.")
-                # If not, prompt the user again without counting this attempt
-                continue
+            if move == "q":
+                self.game_active = False
+                return None
 
-            # Increment the attempts counter only for valid inputs
-            attempts += 1
-
-            # Check if the guess matches the randomly generated number
-            if guess == random_number:
-                # If the guess is correct, exit the loop
-                break
-            if guess < random_number:
-                # Inform the user if the guess is too low
-                print("Too low")
+            try:
+                move = int(move)
+            except ValueError:
+                print("Please enter a number from 1 to 9.")
             else:
-                # Inform the user if the guess is too high
-                print("Too high")
+                if 1 <= move <= 9:
+                    if self.game_board[move] in {"X", "O"}:
+                        print("That position is already taken. Choose another!")
+                    else:
+                        return move
+                else:
+                    print("Number must be between 1 and 9!")
 
-        except ValueError:
-            # Handle the case where the user input is not a valid integer
-            print("Invalid input. Please enter an integer.")
+    def switch_player(self):
+        """Switches the current player between 'X' and 'O'."""
+        if self.current_player == "X":
+            self.current_player = "O"
+        else:
+            self.current_player = "X"
 
-    # Print a congratulatory message including the number of attempts taken
-    print(f"\nGood job! You guessed the number {random_number} in {attempts} attempts")
+    def check_win(self):
+        """Checks if any player has won the game.
+
+        Evaluates the game board to determine if there is a winning combination.
+        
+        Returns:
+            str or None: The symbol of the winning player or None if there is no winner.
+        """
+        winning_combinations = [
+            (1, 2, 3),
+            (4, 5, 6),
+            (7, 8, 9),
+            (1, 4, 7),
+            (2, 5, 8),
+            (3, 6, 9),
+            (1, 5, 9),
+            (7, 5, 3)
+        ]
+
+        for a, b, c in winning_combinations:
+            if self.game_board[a] == self.game_board[b] == self.game_board[c]:
+                return self.game_board[a]
+
+        return None
+
+    def check_draw(self):
+        """Checks if the game ended in a draw.
+
+        Evaluates if all positions on the game board are filled and no winner is found.
+        
+        Returns:
+            str or None: 'draw' if the game is a draw, otherwise None.
+        """
+        if all(cell in {"X", "O"} for cell in self.game_board[1:]):
+            return "draw"
+        return None
+
+    def main(self):
+        """Main function to start and run the Tic-Tac-Toe game.
+
+        Coordinates the flow of the game, including handling player turns, 
+        checking for wins or draws, and switching players.
+        """
+        self.print_board()
+
+        while self.game_active:
+            print()
+            print("Player " + self.current_player + "'s turn")
+            move = self.player_input()
+            if move is not None:
+                self.game_board[move] = self.current_player
+                self.print_board()
+                winner = self.check_win()
+                if winner:
+                    print("Player " + winner + " wins!")
+                    break
+                draw = self.check_draw()
+                if draw:
+                    print("The game ends in a draw.")
+                    break
+                self.switch_player()
 
 if __name__ == "__main__":
-    main()
+    game = TicTacToe()
+    game.main()
